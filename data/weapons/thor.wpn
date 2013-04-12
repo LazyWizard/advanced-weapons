@@ -3,7 +3,7 @@
 	"id":"thor",
 	"type":"ENERGY",
 	"size":"SMALL",
-        "beamEffect":"data.scripts.weapons.MjolnirEffect",
+        "beamEffect":"data.scripts.weapons.ThorEffect",
 	"displayArcRadius":500,
 	"turretSprite":"graphics/weapons/tactical_laser_turret.png",
 	"turretGlowSprite":"graphics/weapons/tactical_laser_turret_glow.png",

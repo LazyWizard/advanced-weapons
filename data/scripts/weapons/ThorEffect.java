@@ -8,7 +8,7 @@ import com.fs.starfarer.api.combat.DamageType;
 import java.awt.Color;
 import org.lazywizard.lazylib.combat.WeaponUtils;
 
-public class MjolnirEffect implements BeamEffectPlugin
+public class ThorEffect implements BeamEffectPlugin
 {
     // What color is the core of the arc?
     private static final Color CORE_COLOR = new Color(255, 255, 255, 255);
@@ -16,8 +16,8 @@ public class MjolnirEffect implements BeamEffectPlugin
     private static final Color FRINGE_COLOR = new Color(85, 25, 215, 255);
     // How long since the last arc (used for DPS calculations)
     private float timeSinceLastArc = 0f;
-    // The current EMP arc
-    private CombatEntityAPI activeArc = null;
+    // The current damaging and decorative (non-targetted) arcs
+    private CombatEntityAPI activeArc = null, decorativeArc = null;
 
     @Override
     public void advance(float amount, CombatEngineAPI engine, BeamAPI beam)
@@ -28,6 +28,11 @@ public class MjolnirEffect implements BeamEffectPlugin
             // Beam hit something - send lightning at it!
             if (beam.getDamageTarget() != null)
             {
+                if (decorativeArc != null && engine.isEntityInPlay(decorativeArc))
+                {
+                    engine.removeEntity(decorativeArc);
+                }
+
                 float damage = timeSinceLastArc
                         * WeaponUtils.calculateDamagePerSecond(beam.getWeapon());
                 float emp = timeSinceLastArc
@@ -41,10 +46,10 @@ public class MjolnirEffect implements BeamEffectPlugin
                         FRINGE_COLOR, CORE_COLOR);
             }
             // Beam missed - send lightning anyway!
-            else
+            else if (decorativeArc == null || !engine.isEntityInPlay(decorativeArc))
             {
                 timeSinceLastArc = 0f;
-                activeArc = engine.spawnEmpArc(beam.getSource(), beam.getFrom(),
+                decorativeArc = engine.spawnEmpArc(beam.getSource(), beam.getFrom(),
                         beam.getSource(), new FakeEntity(beam.getTo()),
                         DamageType.ENERGY, 0f, 0f,
                         beam.getWeapon().getRange(),
