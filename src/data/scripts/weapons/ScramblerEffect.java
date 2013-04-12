@@ -1,0 +1,55 @@
+package data.scripts.weapons;
+
+import com.fs.starfarer.api.combat.BeamAPI;
+import com.fs.starfarer.api.combat.BeamEffectPlugin;
+import com.fs.starfarer.api.combat.CombatEngineAPI;
+import com.fs.starfarer.api.combat.CombatEntityAPI;
+import com.fs.starfarer.api.combat.MissileAPI;
+import java.awt.Color;
+import java.util.*;
+import org.lazywizard.lazylib.combat.CombatUtils;
+
+// This is designed for burst beams
+public class ScramblerEffect implements BeamEffectPlugin
+{
+    private static final float SCRAMBLE_CHANCE = .25f;
+    private Set scrambled = new HashSet();
+
+    @Override
+    public void advance(float amount, CombatEngineAPI engine, BeamAPI beam)
+    {
+        // Remove expired projectiles
+        for (Iterator iter = scrambled.iterator(); iter.hasNext();)
+        {
+            if (!CombatUtils.getCombatEngine().isEntityInPlay(
+                    (MissileAPI) iter.next()))
+            {
+                iter.remove();
+            }
+        }
+
+        // Check if we hit a missile this frame
+        CombatEntityAPI target = beam.getDamageTarget();
+        if (target != null && target instanceof MissileAPI)
+        {
+            MissileAPI missile = (MissileAPI) target;
+
+            // Only one chance to scramble a missile!
+            if (scrambled.contains(missile))
+            {
+                return;
+            }
+
+            scrambled.add(missile);
+
+            // Check if this missile will be scrambled
+            if (Math.random() < SCRAMBLE_CHANCE)
+            {
+                missile.setOwner(beam.getSource().getOwner());
+                missile.setSource(beam.getSource());
+                engine.spawnExplosion(missile.getLocation(), missile.getVelocity(),
+                        Color.GREEN, 15f, .85f);
+            }
+        }
+    }
+}

@@ -1,0 +1,5 @@
+name,id,tier,base value,range,damage/second,damage/shot,emp,impact,turn rate,OPs,ammo,ammo/sec,type,energy/shot,energy/second,chargeup,chargedown,burst size,burst delay,min spread,max spread,spread/shot,spread decay/sec,beam speed,proj speed,launch speed,flight time,proj hitpoints,hints,number
+Impaler,impaler,2,7500,800,,250,0,0,7.5,14,60,,HIGH_EXPLOSIVE,300,,0.3,0.7,,,,,,,,1600,,,200,,6
+Scrambler,scrambler,2,1400,450,75,,,0,75,6,2,0.5,ENERGY,,100,0,0.25,0.5,0,,,,,10000,,,,,PD,15.6
+Thor,thor,1,5000,600,250,,,0,50,20,,,ENERGY,,250,0,0,,,,,,,2400,,,,,,24
+Mjolnir,mjolnir,1,1200,250,115,,50,0,20,5,,,ENERGY,,200,0.5,1,,,,,,,2400,,,,,,18
