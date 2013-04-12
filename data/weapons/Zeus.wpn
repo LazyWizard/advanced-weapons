@@ -4,7 +4,7 @@
     "type":"ENERGY",
     "size":"MEDIUM",
     "displayArcRadius":1250,
-    "beamEffect":"data.scripts.weapons.ChainLightningEffect",
+    "beamEffect":"data.scripts.weapons.ZeusEffect",
     "turretSprite":"graphics/weapons/hil_turret_base.png",
     "turretGlowSprite":"graphics/weapons/hil_turret_glow.png",
     "hardpointSprite":"graphics/weapons/hil_hardpoint_base.png",
