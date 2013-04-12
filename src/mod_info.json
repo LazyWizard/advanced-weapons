@@ -1,0 +1,8 @@
+{
+    "id":"lw_advweapons",
+    "name":"Advanced Weapons Pack",
+    "author":"LazyWizard",
+    "version":"0.1",
+    "description":"A collection of weapons utilizing custom effects code.\n\nThis weapon pack currently contains:\n - The Impaler, a medium ballistic projectile that pierces through targets.\n - The Mjolnir, a small energy weapon that fires bolts of lightning at your foes.\n - The Thor, a medium energy weapon that fires bolts of chain lightning at your foes.\n - The Scrambler, a very weak small energy point defense weapon that has a chance of converting missiles to your side.\n\nRequires LazyLib 1.3 or higher.",
+    "gameVersion":"0.54.1a",
+}

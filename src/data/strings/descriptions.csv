@@ -1,0 +1,11 @@
+id,type,text1,text2,text3,notes
+impaler,WEAPON,"An experimental weapon that fires a semi-phased shell. This gives it the unique ability to pierce through enemy targets.
+
+This weapon system's ammo autofac utilizes a loophole in normal physics created by the use of phase space: the ability to compress matter to a degree impossible in normal space. This - combined with the projectile's phased state - allows a shot to penetrate dense barriers with minimal loss in momentum while still disrupting any matter in its path.
+
+As the projectile lacks a flux capacitor to recharge its built-in phase coil, it is unable to pass through areas of space that have sufficiently high flux concentrations. This causes the projectile to drop back into normal space upon contact with a ship's shield.
+
+Because the uncompressed matter used as a base for projectiles takes up a large amount of space, ammo storage for this weapon is somewhat limited.",Close Support,,
+thor,WEAPON,"",Assault,,
+scrambler,WEAPON,"",Point Defense,,
+mjolnir,WEAPON,,Assault,,
