@@ -16,7 +16,7 @@ public class ThorEffect implements BeamEffectPlugin
     private static final Color FRINGE_COLOR = new Color(85, 25, 215, 255);
     // How long since the last arc (used for DPS calculations)
     private float timeSinceLastArc = 0f;
-    // The current damaging and decorative (non-targetted) arcs
+    // The current damaging and decorative (non-targeted) arcs
     private CombatEntityAPI activeArc = null, decorativeArc = null;
 
     @Override
@@ -55,6 +55,10 @@ public class ThorEffect implements BeamEffectPlugin
                         beam.getWeapon().getRange(),
                         "tachyon_lance_emp_impact", 15f,
                         FRINGE_COLOR, CORE_COLOR);
+            }
+            else
+            {
+                timeSinceLastArc += amount;
             }
         }
     }
