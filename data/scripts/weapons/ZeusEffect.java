@@ -1,5 +1,3 @@
-//Zeus,zeus,1,5000,600,250,,50,0,20,15,,,ENERGY,,300,,,,,,,,,2400,,,,,,24
-
 package data.scripts.weapons;
 
 import com.fs.starfarer.api.combat.BeamAPI;
@@ -34,7 +32,7 @@ public class ZeusEffect implements BeamEffectPlugin
     private static final Color FRINGE_COLOR = new Color(85, 25, 215, 255);
     // How long since the last arc (used for DPS calculations)
     private float timeSinceLastArc = 0f;
-    // The current damaging and decorative (non-targetted) arcs
+    // The current damaging and decorative (non-targeted) arcs
     private CombatEntityAPI activeArc = null, decorativeArc = null;
 
     public void spawnChain(BeamAPI beam)
@@ -179,7 +177,10 @@ public class ZeusEffect implements BeamEffectPlugin
                         "tachyon_lance_emp_impact", 15f,
                         FRINGE_COLOR, CORE_COLOR);
             }
+            else
+            {
+                timeSinceLastArc += amount;
+            }
         }
-
     }
 }
