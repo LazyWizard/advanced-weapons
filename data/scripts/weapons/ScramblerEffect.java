@@ -7,7 +7,7 @@ import com.fs.starfarer.api.combat.CombatEntityAPI;
 import com.fs.starfarer.api.combat.MissileAPI;
 import java.awt.Color;
 import java.util.*;
-import org.lazywizard.lazylib.combat.CombatUtils;
+import org.lazywizard.lazylib.combat.WeaponUtils;
 
 // This is designed for burst beams
 public class ScramblerEffect implements BeamEffectPlugin
@@ -21,8 +21,7 @@ public class ScramblerEffect implements BeamEffectPlugin
         // Remove expired projectiles
         for (Iterator iter = scrambled.iterator(); iter.hasNext();)
         {
-            if (!CombatUtils.getCombatEngine().isEntityInPlay(
-                    (MissileAPI) iter.next()))
+            if (!engine.isEntityInPlay((MissileAPI) iter.next()))
             {
                 iter.remove();
             }
@@ -33,6 +32,20 @@ public class ScramblerEffect implements BeamEffectPlugin
         if (target != null && target instanceof MissileAPI)
         {
             MissileAPI missile = (MissileAPI) target;
+
+            // Apply extra damage to unguided missiles
+            if (missile.isFizzling())
+            {
+                engine.applyDamage(missile, missile.getLocation(),
+                        (beam.getWeapon().isBurstBeam()
+                        ? WeaponUtils.calculateDamagePerBurst(beam.getWeapon())
+                        : (WeaponUtils.calculateDamagePerSecond(beam.getWeapon())
+                        * amount)),
+                        beam.getWeapon().getDamageType(),
+                        beam.getWeapon().getDerivedStats().getEmpPerShot(),
+                        false, true, beam.getSource());
+                return;
+            }
 
             // Only one chance to scramble a missile!
             if (scrambled.contains(missile))

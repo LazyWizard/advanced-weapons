@@ -21,7 +21,7 @@ import org.lwjgl.util.vector.Vector2f;
 public class ArmorPiercePlugin implements EveryFrameCombatPlugin
 {
     // Sound to play while piercing a target's armor (should be loopable!)
-    private static final String PIERCE_SOUND = "explosion_flak";
+    private static final String PIERCE_SOUND = "explosion_flak"; // TEMPORARY
     // Projectile ID (String), pierces shields (boolean)
     private static final Map PROJ_IDS = new HashMap();
     // Keep track of the original collision class (used for shield hits)
@@ -127,7 +127,7 @@ public class ArmorPiercePlugin implements EveryFrameCombatPlugin
                     // Render the hit
                     CombatUtils.getCombatEngine().spawnExplosion(
                             proj.getLocation(), entity.getVelocity(),
-                            Color.ORANGE, 10f, .5f);
+                            Color.ORANGE, speed * amount * .65f, .5f);
 
                     // Play piercing sound (only one sound active per projectile)
                     Global.getSoundPlayer().playLoop(PIERCE_SOUND, proj, 1f, 1f,
