@@ -38,6 +38,11 @@ public class ArmorPiercePlugin implements EveryFrameCombatPlugin
     @Override
     public void advance(float amount, List events)
     {
+        if (CombatUtils.getCombatEngine().isPaused())
+        {
+            return;
+        }
+
         DamagingProjectileAPI proj;
         CombatEntityAPI entity;
         String spec;
