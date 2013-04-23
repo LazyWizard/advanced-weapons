@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import org.lazywizard.lazylib.CollisionUtils;
 import org.lazywizard.lazylib.MathUtils;
 import org.lazywizard.lazylib.combat.CombatUtils;
@@ -23,7 +24,7 @@ public class ArmorPiercePlugin implements EveryFrameCombatPlugin
     // Sound to play while piercing a target's armor (should be loopable!)
     private static final String PIERCE_SOUND = "explosion_flak"; // TEMPORARY
     // Projectile ID (String), pierces shields (boolean)
-    private static final Map PROJ_IDS = new HashMap();
+    private static final Map PROJ_IDS = new TreeMap();
     // Keep track of the original collision class (used for shield hits)
     private static final Map originalCollisionClasses = new HashMap();
 
@@ -121,7 +122,7 @@ public class ArmorPiercePlugin implements EveryFrameCombatPlugin
                     // Note: BALLISTIC_AS_BEAM projectiles won't be slowed!
                     CombatUtils.getCombatEngine().applyDamage(entity,
                             proj.getLocation(), damage, proj.getDamageType(),
-                            emp, false, true, proj.getSource());
+                            emp, true, true, proj.getSource());
                     proj.getVelocity().scale(1.0f - (amount * 1.5f));
 
                     // Render the hit
