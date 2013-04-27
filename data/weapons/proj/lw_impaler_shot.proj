@@ -1,5 +1,5 @@
 {
-	"id":"impaler_shot",
+	"id":"lw_impaler_shot",
 	"specClass":"projectile",
 	"spawnType":"BALLISTIC_AS_BEAM",
 	"collisionClass":"RAY",

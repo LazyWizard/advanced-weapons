@@ -1,5 +1,5 @@
 {
-	"id":"impaler",  # this id must match what's in the spreadsheet
+	"id":"lw_impaler",  # this id must match what's in the spreadsheet
 	"specClass":"projectile",
 	"type":"BALLISTIC",
 	"size":"MEDIUM",
@@ -23,6 +23,6 @@
 					   "particleCount":25,
 					   "particleColor":[100,100,255,255]},	
 	"autocharge":true,  # whether the weapon will continue charging and fire if the LMB is tapped instead of held
-	"projectileSpecId":"impaler_shot",  # projectile that will be fired
+	"projectileSpecId":"lw_impaler_shot",  # projectile that will be fired
 	"fireSoundTwo":"energy_pulse",
 }

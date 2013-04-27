@@ -1,6 +1,6 @@
 {
     "specClass":"beam",
-    "id":"zeus",
+    "id":"lw_zeus",
     "type":"ENERGY",
     "size":"MEDIUM",
     "displayArcRadius":1250,

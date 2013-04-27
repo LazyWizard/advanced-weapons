@@ -1,6 +1,6 @@
 {
     "specClass":"beam",
-    "id":"scrambler",
+    "id":"lw_scrambler",
     "type":"ENERGY",
     "size":"SMALL",
     "beamEffect":"data.scripts.weapons.ScramblerEffect",

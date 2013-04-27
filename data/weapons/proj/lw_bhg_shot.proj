@@ -1,5 +1,5 @@
 {
-	"id":"bhg_shot",
+	"id":"lw_bhg_shot",
 	"specClass":"missile",	
 	"missileType":"PHASE_CHARGE",
 	"sprite":"graphics/missiles/phase_charge_base.png",

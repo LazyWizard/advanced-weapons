@@ -1,6 +1,6 @@
 {
 	"specClass":"beam",
-	"id":"thor",
+	"id":"lw_thor",
 	"type":"ENERGY",
 	"size":"SMALL",
         "beamEffect":"data.scripts.weapons.ThorEffect",
