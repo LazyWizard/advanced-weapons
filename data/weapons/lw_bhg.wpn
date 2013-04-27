@@ -1,5 +1,5 @@
 {
-	"id":"bhg",  # this id must match what's in the spreadsheet
+	"id":"lw_bhg",  # this id must match what's in the spreadsheet
 	"specClass":"projectile",
 	"type":"BALLISTIC",
 	"size":"LARGE",
@@ -20,9 +20,9 @@
 					   "particleSizeRange":0.0,
 					   "particleDuration":0.0,
 					   "particleCount":0,
-					   "particleColor":[100,100,255,255]},	
+					   "particleColor":[100,100,255,255]},
 	"autocharge":true,  # whether the weapon will continue charging and fire if the LMB is tapped instead of held
 	"requiresFullCharge":false,  # for pulse weapons - whether the weapon will fire at a lower strength partial charge
-	"projectileSpecId":"bhg_shot",  # projectile that will be fired
+	"projectileSpecId":"lw_bhg_shot",  # projectile that will be fired
 	"fireSoundTwo":"energy_pulse_light",
 }
