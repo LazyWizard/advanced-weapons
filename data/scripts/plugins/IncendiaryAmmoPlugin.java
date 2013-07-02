@@ -6,8 +6,11 @@ import com.fs.starfarer.api.combat.DamageType;
 import com.fs.starfarer.api.combat.EveryFrameCombatPlugin;
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import org.lazywizard.lazylib.CollectionUtils;
 import org.lazywizard.lazylib.MathUtils;
 import org.lazywizard.lazylib.combat.CombatUtils;
 import org.lazywizard.lazylib.combat.entities.SimpleEntity;
@@ -15,12 +18,17 @@ import org.lwjgl.util.vector.Vector2f;
 
 public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
 {
-    private static Color[] FIRE_COLORS =
-    {
-        Color.RED, Color.YELLOW, Color.ORANGE, Color.ORANGE, Color.YELLOW
-    };
+    //private static final float FIRE_SIZE = 15f;
+    //private static final Map FIRE_COLORS = new HashMap();
     private static List burning = new ArrayList();
     private CombatEngineAPI engine;
+
+    /*static
+    {
+        FIRE_COLORS.put(Color.RED, 3f);
+        FIRE_COLORS.put(Color.ORANGE, 2f);
+        FIRE_COLORS.put(Color.YELLOW, 1f);
+    }*/
 
     @Override
     public void advance(float amount, List events)
@@ -33,7 +41,7 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
 
         // Deal fire damage for all actively burning projectiles
         FireData fire;
-        float sparkVelocity;
+        float sparkSpeed;
         for (Iterator iter = burning.iterator(); iter.hasNext();)
         {
             fire = (FireData) iter.next();
@@ -46,15 +54,26 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
             }
             else
             {
-                sparkVelocity = MathUtils.getRandomNumberInRange(50f, 200f);
-                engine.applyDamage(fire.getAnchor(), fire.getLocation(),
-                        fire.dps * amount, DamageType.FRAGMENTATION,
-                        fire.dps * amount, true, true, fire.source);
-                engine.addSmokeParticle(fire.getLocation(),
-                        MathUtils.getPointOnCircumference(null, sparkVelocity,
-                        (float) (Math.random() * 360f)),
-                        MathUtils.getRandomNumberInRange(1f, 3f), .75f, 1f,
-                        FIRE_COLORS[(int) (Math.random() * FIRE_COLORS.length)]);
+                // TODO: Make the fire effect look good
+                /*if (Math.random() > .5f)
+                {
+                    sparkSpeed = MathUtils.getRandomNumberInRange(5f, 20f);
+                    engine.applyDamage(fire.getAnchor(), fire.getLocation(),
+                            fire.dps * amount, DamageType.FRAGMENTATION,
+                            fire.dps * amount, true, true, fire.source);
+                    engine.addSmokeParticle(fire.getLocation(),
+                            MathUtils.getRandomPointOnCircumference(null, sparkSpeed),
+                            MathUtils.getRandomNumberInRange(1f, 3f),
+                            .25f, FIRE_SIZE / sparkSpeed,
+                            (Color) CollectionUtils.weightedRandom(FIRE_COLORS));
+                }*/
+                if (Math.random() > .9)
+                {
+                    engine.addSmokeParticle(fire.getLocation(),
+                            MathUtils.getRandomPointOnCircumference(null, 5f),
+                            MathUtils.getRandomNumberInRange(20f, 40f),
+                            .1f, 5f, Color.DARK_GRAY);
+                }
             }
         }
     }
