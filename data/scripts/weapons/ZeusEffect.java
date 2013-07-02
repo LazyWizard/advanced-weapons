@@ -12,6 +12,7 @@ import org.lazywizard.lazylib.MathUtils;
 import org.lazywizard.lazylib.combat.AIUtils;
 import org.lazywizard.lazylib.combat.CombatUtils;
 import org.lazywizard.lazylib.combat.WeaponUtils;
+import org.lazywizard.lazylib.combat.entities.SimpleEntity;
 import org.lwjgl.util.vector.Vector2f;
 
 public class ZeusEffect implements BeamEffectPlugin
@@ -171,7 +172,7 @@ public class ZeusEffect implements BeamEffectPlugin
             {
                 timeSinceLastArc = 0f;
                 decorativeArc = engine.spawnEmpArc(beam.getSource(), beam.getFrom(),
-                        beam.getSource(), new FakeEntity(beam.getTo()),
+                        beam.getSource(), new SimpleEntity(beam.getTo()),
                         DamageType.ENERGY, 0f, 0f,
                         beam.getWeapon().getRange(),
                         "tachyon_lance_emp_impact", 15f,
