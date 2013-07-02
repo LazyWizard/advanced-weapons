@@ -7,6 +7,7 @@ import com.fs.starfarer.api.combat.CombatEntityAPI;
 import com.fs.starfarer.api.combat.DamageType;
 import java.awt.Color;
 import org.lazywizard.lazylib.combat.WeaponUtils;
+import org.lazywizard.lazylib.combat.entities.SimpleEntity;
 
 public class ThorEffect implements BeamEffectPlugin
 {
@@ -50,7 +51,7 @@ public class ThorEffect implements BeamEffectPlugin
             {
                 timeSinceLastArc = 0f;
                 decorativeArc = engine.spawnEmpArc(beam.getSource(), beam.getFrom(),
-                        beam.getSource(), new FakeEntity(beam.getTo()),
+                        beam.getSource(), new SimpleEntity(beam.getTo()),
                         DamageType.ENERGY, 0f, 0f,
                         beam.getWeapon().getRange(),
                         "tachyon_lance_emp_impact", 15f,
