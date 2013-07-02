@@ -14,6 +14,7 @@ import org.lazywizard.lazylib.MathUtils;
 import org.lazywizard.lazylib.combat.CombatUtils;
 import org.lwjgl.util.vector.Vector2f;
 
+// TODO: Change calculations to use time elapsed instead of number of frames
 public class BlackHoleGeneratorPlugin implements EveryFrameCombatPlugin
 {
     /** Whether to show debug particles in and around the black holes */
