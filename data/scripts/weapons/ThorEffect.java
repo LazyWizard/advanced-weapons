@@ -14,7 +14,7 @@ public class ThorEffect implements BeamEffectPlugin
     // What color is the core of the arc?
     private static final Color CORE_COLOR = new Color(255, 255, 255, 255);
     // What color is the fringe of the arc?
-    private static final Color FRINGE_COLOR = new Color(85, 25, 215, 255);
+    private static final Color FRINGE_COLOR = Color.YELLOW; //new Color(85, 25, 215, 255);
     // How long since the last arc (used for DPS calculations)
     private float timeSinceLastArc = 0f;
     // The current damaging and decorative (non-targeted) arcs
