@@ -20,7 +20,7 @@ public class BlackHoleGeneratorPlugin implements EveryFrameCombatPlugin
     /** Whether to show debug particles in and around the black holes */
     private static final boolean RENDER_DEBUG = false;
     /** The projectile ID of the shell that creates black holes */
-    private static final String SHELL_ID = "bhg_shot";
+    private static final String SHELL_ID = "lw_bhg_shot";
     /** How long the shell stays on the map before exploding */
     private static final float EXPLOSION_DELAY = 5f;
     /** How long the black hole lasts before collapsing */
@@ -412,6 +412,11 @@ public class BlackHoleGeneratorPlugin implements EveryFrameCombatPlugin
     @Override
     public void advance(float amount, List events)
     {
+        if (engine.isPaused())
+        {
+            return;
+        }
+
         update(amount);
     }
 

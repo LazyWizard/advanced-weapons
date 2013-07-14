@@ -32,7 +32,7 @@ public class ArmorPiercePlugin implements EveryFrameCombatPlugin
     {
         // Add all projectiles that should pierce armor here
         // Format: Projectile ID (String), pierces shields (boolean)
-        PROJ_IDS.put("impaler_shot", false);
+        PROJ_IDS.put("lw_impaler_shot", false);
     }
 
     @Override
