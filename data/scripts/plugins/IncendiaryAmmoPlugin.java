@@ -10,7 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import org.lazywizard.lazylib.MathUtils;
 import org.lazywizard.lazylib.combat.CombatUtils;
-import org.lazywizard.lazylib.combat.entities.SimpleEntity;
+import org.lazywizard.lazylib.combat.entities.AnchoredEntity;
 import org.lwjgl.util.vector.Vector2f;
 
 // TODO: Check for nearby fires and merge them for better performance
@@ -76,14 +76,14 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
 
     private static class FireData
     {
-        private SimpleEntity hitLoc;
+        private AnchoredEntity hitLoc;
         private CombatEntityAPI source;
         private float dps, expiration;
 
         public FireData(CombatEntityAPI target, Vector2f hitLoc,
                 float totalDamage, float burnDuration, CombatEntityAPI source)
         {
-            this.hitLoc = new SimpleEntity(hitLoc, target);
+            this.hitLoc = new AnchoredEntity(target, hitLoc);
             this.source = source;
             dps = totalDamage / burnDuration;
             expiration = CombatUtils.getElapsedCombatTime() + burnDuration;
