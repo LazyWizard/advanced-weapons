@@ -9,7 +9,10 @@ import com.fs.starfarer.api.combat.MissileAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.ShipAPI.HullSize;
 import java.awt.Color;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import org.lazywizard.lazylib.MathUtils;
 import org.lazywizard.lazylib.combat.CombatUtils;
 import org.lwjgl.util.vector.Vector2f;
@@ -72,19 +75,19 @@ public class BlackHoleGeneratorPlugin implements EveryFrameCombatPlugin
     /** A Vector2f constant of (0,0) for optimization purposes */
     private static final Vector2f NULLVEL = new Vector2f(0, 0);
     /** The current combat engine */
-    private static CombatEngineAPI engine;
+    private CombatEngineAPI engine;
     /** Time since the battle started */
-    private static float curTime = 0f;
+    private float curTime = 0f;
     /** How many frames since the battle started */
-    private static int numUpdates = 0;
+    private int numUpdates = 0;
     /** When to next render floating text */
-    private static float nextRender = RENDER_TEXT_INTERVAL;
+    private float nextRender = RENDER_TEXT_INTERVAL;
     /** Tracks shells - key = projectile, value = time to explode */
-    private static Map projs = new HashMap();
+    private Map projs = new HashMap();
     /** Tracks holes - key = location, value = time to expire */
-    private static Map holes = new HashMap();
+    private Map holes = new HashMap();
 
-    private static void applyDamage(Vector2f center, CombatEntityAPI victim, float time)
+    private void applyDamage(Vector2f center, CombatEntityAPI victim, float time)
     {
         // Get a random point in the core of the black hole
         Vector2f point = MathUtils.getRandomPointInCircle(center,
@@ -115,7 +118,7 @@ public class BlackHoleGeneratorPlugin implements EveryFrameCombatPlugin
     // 2 particles per frame * 60 frames per second * .75 second duration (avg)
     // equals around 90 particles on screen at a time for each black hole
     // Add another 200 particles if RENDER_DEBUG is set to true
-    private static void renderHole(Vector2f center, float remaining)
+    private void renderHole(Vector2f center, float remaining)
     {
         // Fade away when about to expire
         float glowStrength = (remaining > FADE_TIME ? 1f : remaining / FADE_TIME);
@@ -174,7 +177,7 @@ public class BlackHoleGeneratorPlugin implements EveryFrameCombatPlugin
         }
     }
 
-    private static void renderProjs()
+    private void renderProjs()
     {
         Map.Entry tmp;
         DamagingProjectileAPI proj;
@@ -201,6 +204,39 @@ public class BlackHoleGeneratorPlugin implements EveryFrameCombatPlugin
         }
     }
 
+    private static float getPullStrengthMod(CombatEntityAPI victim)
+    {
+        float mod = 1.0f;
+
+        if (victim instanceof ShipAPI)
+        {
+            ShipAPI ship = (ShipAPI) victim;
+            // Modify pull strength based on ship class
+            if (ship.getHullSize() == HullSize.FIGHTER)
+            {
+                mod *= STRENGTH_VS_FIGHTER;
+            }
+            else if (ship.getHullSize() == HullSize.FRIGATE)
+            {
+                mod *= STRENGTH_VS_FRIGATE;
+            }
+            else if (ship.getHullSize() == HullSize.DESTROYER)
+            {
+                mod *= STRENGTH_VS_DESTROYER;
+            }
+            else if (ship.getHullSize() == HullSize.CRUISER)
+            {
+                mod *= STRENGTH_VS_CRUISER;
+            }
+            else if (ship.getHullSize() == HullSize.CAPITAL_SHIP)
+            {
+                mod *= STRENGTH_VS_CAPITAL;
+            }
+        }
+
+        return mod;
+    }
+
     private static void pull(Vector2f center, CombatEntityAPI victim, float time)
     {
         Vector2f velocity, direction;
@@ -213,37 +249,7 @@ public class BlackHoleGeneratorPlugin implements EveryFrameCombatPlugin
 
         // TODO: replace linear decay with a curve, factor in mass
         float strength = (1f - distance / GRAVITY_WELL_RADIUS) * PULL_STRENGTH;
-
-        // Ships are treated differently than projectiles/asteroids
-        if (victim instanceof ShipAPI)
-        {
-            ShipAPI ship = (ShipAPI) victim;
-
-            // Modify pull strength based on ship class
-            if (ship.getHullSize() == HullSize.FIGHTER)
-            {
-                strength *= STRENGTH_VS_FIGHTER;
-            }
-            else if (ship.getHullSize() == HullSize.FRIGATE)
-            {
-                strength *= STRENGTH_VS_FRIGATE;
-            }
-            else if (ship.getHullSize() == HullSize.DESTROYER)
-            {
-                strength *= STRENGTH_VS_DESTROYER;
-            }
-            else if (ship.getHullSize() == HullSize.CRUISER)
-            {
-                strength *= STRENGTH_VS_CRUISER;
-            }
-            else if (ship.getHullSize() == HullSize.CAPITAL_SHIP)
-            {
-                strength *= STRENGTH_VS_CAPITAL;
-            }
-
-            // Prevent exploit of using hole as slingshot for massive speed boost
-            maxVelocity = ship.getMutableStats().getMaxSpeed().getBaseValue() * 2f;
-        }
+        strength *= getPullStrengthMod(victim);
 
         // Modify the velocity towards the center of the hole
         velocity.set(velocity.x + (direction.x * strength * time),
@@ -258,7 +264,7 @@ public class BlackHoleGeneratorPlugin implements EveryFrameCombatPlugin
         }
     }
 
-    private static void updateHoles(float time)
+    private void updateHoles(float time)
     {
         Map.Entry tmp;
         Vector2f center;
@@ -307,7 +313,7 @@ public class BlackHoleGeneratorPlugin implements EveryFrameCombatPlugin
         }
     }
 
-    private static void scanForProjs()
+    private void scanForProjs()
     {
         DamagingProjectileAPI toCheck;
 
@@ -340,7 +346,7 @@ public class BlackHoleGeneratorPlugin implements EveryFrameCombatPlugin
         }
     }
 
-    private static void checkProjs()
+    private void checkProjs()
     {
         // Scan for any projectiles that haven't been registered yet
         scanForProjs();
@@ -371,30 +377,25 @@ public class BlackHoleGeneratorPlugin implements EveryFrameCombatPlugin
         }
     }
 
-    private static void createBlackHole(DamagingProjectileAPI shell, float duration)
+    private void createBlackHole(DamagingProjectileAPI shell, float duration)
     {
         Vector2f location = shell.getLocation();
         // Remove the projectile
         engine.removeEntity(shell);
-        engine.spawnExplosion(location, new Vector2f(0, 0),
+        engine.spawnExplosion(location, NULLVEL,
                 GRAVITY_WELL_PARTICLE_COLOR, 50f, duration);
         // Create a black hole in its place
         holes.put(new Vector2f(location), curTime + duration);
     }
 
-    private static void resetVars(CombatEngineAPI engine)
+    @Override
+    public void advance(float amount, List events)
     {
-        // Clear all non-final static vars to their original state
-        BlackHoleGeneratorPlugin.engine = engine;
-        projs.clear();
-        holes.clear();
-        curTime = 0f;
-        numUpdates = 0;
-        nextRender = RENDER_TEXT_INTERVAL;
-    }
+        if (engine.isPaused())
+        {
+            return;
+        }
 
-    private static void update(float amount)
-    {
         // Update time and number of frames since the beginning of combat
         curTime += amount;
         numUpdates++;
@@ -410,19 +411,8 @@ public class BlackHoleGeneratorPlugin implements EveryFrameCombatPlugin
     }
 
     @Override
-    public void advance(float amount, List events)
-    {
-        if (engine.isPaused())
-        {
-            return;
-        }
-
-        update(amount);
-    }
-
-    @Override
     public void init(CombatEngineAPI engine)
     {
-        resetVars(engine);
+        this.engine = engine;
     }
 }
