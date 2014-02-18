@@ -23,5 +23,5 @@
 					   "particleCount":12,
 					   "particleColor":[255,240,165,200]},
 	"projectileSpecId":"lw_infernal_shot",  # projectile that will be fired
-	"fireSoundTwo":"gun_medium_mauler",
+	"fireSoundTwo":"heavy_mauler_fire",	
 }
