@@ -21,7 +21,7 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
 {
     // How long between damage/particle effect ticks
     private static final float TIME_BETWEEN_DAMAGE_TICKS = .2f;
-    private static final float TIME_BETWEEN_PARTICLE_TICKS = .1f;
+    private static final float TIME_BETWEEN_PARTICLE_TICKS = .8f;
     // Stores the currently burning fires
     // Having the Set backed by a WeakHashMap helps prevent memory leaks
     private static final Set burning = Collections.newSetFromMap(new WeakHashMap());
