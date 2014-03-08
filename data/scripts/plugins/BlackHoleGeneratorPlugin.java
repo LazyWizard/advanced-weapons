@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.lazywizard.lazylib.MathUtils;
+import org.lazywizard.lazylib.VectorUtils;
 import org.lazywizard.lazylib.combat.CombatUtils;
 import org.lwjgl.util.vector.Vector2f;
 
@@ -245,7 +246,7 @@ public class BlackHoleGeneratorPlugin implements EveryFrameCombatPlugin
         velocity = victim.getVelocity();
         distance = MathUtils.getDistance(victim, center);
         // Normalized directional vector
-        direction = MathUtils.getDirectionalVector(victim, center);
+        direction = VectorUtils.getDirectionalVector(victim.getLocation(), center);
 
         // TODO: replace linear decay with a curve, factor in mass
         float strength = (1f - distance / GRAVITY_WELL_RADIUS) * PULL_STRENGTH;

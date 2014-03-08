@@ -1,5 +1,6 @@
 package data.scripts.weapons;
 
+import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.BeamAPI;
 import com.fs.starfarer.api.combat.BeamEffectPlugin;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
@@ -10,8 +11,6 @@ import java.awt.Color;
 import java.util.*;
 import org.lazywizard.lazylib.MathUtils;
 import org.lazywizard.lazylib.combat.AIUtils;
-import org.lazywizard.lazylib.combat.CombatUtils;
-import org.lazywizard.lazylib.combat.WeaponUtils;
 import org.lazywizard.lazylib.combat.entities.SimpleEntity;
 import org.lwjgl.util.vector.Vector2f;
 
@@ -51,8 +50,7 @@ public class ZeusEffect implements BeamEffectPlugin
 
         float range = beam.getWeapon().getRange();
         // Ensure we keep the same DPS as listed in the weapon's stats tooltip
-        float damage = timeSinceLastArc
-                * WeaponUtils.calculateDamagePerSecond(beam.getWeapon());
+        float damage = timeSinceLastArc * beam.getWeapon().getDerivedStats().getDps();
         float emp = timeSinceLastArc
                 * beam.getWeapon().getDerivedStats().getEmpPerSecond();
 
@@ -63,7 +61,7 @@ public class ZeusEffect implements BeamEffectPlugin
         do
         {
             // Spawn this chain's lightning arc
-            activeArc = CombatUtils.getCombatEngine().spawnEmpArc(
+            activeArc = Global.getCombatEngine().spawnEmpArc(
                     beam.getSource(), source,
                     currentEmitter, currentVictim,
                     DamageType.ENERGY, damage, emp, range,

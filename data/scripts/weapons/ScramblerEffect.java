@@ -37,10 +37,7 @@ public class ScramblerEffect implements BeamEffectPlugin
             if (missile.isFizzling())
             {
                 engine.applyDamage(missile, missile.getLocation(),
-                        (beam.getWeapon().isBurstBeam()
-                        ? WeaponUtils.calculateDamagePerBurst(beam.getWeapon())
-                        : (WeaponUtils.calculateDamagePerSecond(beam.getWeapon())
-                        * amount)),
+                        beam.getWeapon().getDerivedStats().getDps() * amount,
                         beam.getWeapon().getDamageType(),
                         beam.getWeapon().getDerivedStats().getEmpPerShot(),
                         false, true, beam.getSource());
