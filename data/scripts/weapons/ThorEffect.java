@@ -34,10 +34,8 @@ public class ThorEffect implements BeamEffectPlugin
                     engine.removeEntity(decorativeArc);
                 }
 
-                float damage = timeSinceLastArc
-                        * WeaponUtils.calculateDamagePerSecond(beam.getWeapon());
-                float emp = timeSinceLastArc
-                        * beam.getWeapon().getDerivedStats().getEmpPerSecond();
+                float damage = timeSinceLastArc * beam.getWeapon().getDerivedStats().getDps();
+                float emp = timeSinceLastArc * beam.getWeapon().getDerivedStats().getEmpPerSecond();
                 timeSinceLastArc = 0f;
                 activeArc = engine.spawnEmpArc(beam.getSource(), beam.getFrom(),
                         beam.getSource(), beam.getDamageTarget(),

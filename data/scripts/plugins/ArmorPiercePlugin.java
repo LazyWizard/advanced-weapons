@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import org.lazywizard.lazylib.CollisionUtils;
-import org.lazywizard.lazylib.MathUtils;
+import org.lazywizard.lazylib.VectorUtils;
 import org.lazywizard.lazylib.combat.CombatUtils;
 import org.lwjgl.util.vector.Vector2f;
 
@@ -27,6 +27,7 @@ public class ArmorPiercePlugin implements EveryFrameCombatPlugin
     private static final Map PROJ_IDS = new TreeMap();
     // Keep track of the original collision class (used for shield hits)
     private static final Map originalCollisionClasses = new HashMap();
+    private CombatEngineAPI engine;
 
     static
     {
@@ -38,7 +39,7 @@ public class ArmorPiercePlugin implements EveryFrameCombatPlugin
     @Override
     public void advance(float amount, List events)
     {
-        if (CombatUtils.getCombatEngine().isPaused())
+        if (engine.isPaused())
         {
             return;
         }
@@ -48,7 +49,7 @@ public class ArmorPiercePlugin implements EveryFrameCombatPlugin
         String spec;
 
         // Scan all shots on the map for armor piercing projectiles
-        for (Iterator iter = CombatUtils.getCombatEngine()
+        for (Iterator iter = engine
                 .getProjectiles().iterator(); iter.hasNext();)
         {
             proj = (DamagingProjectileAPI) iter.next();
@@ -105,9 +106,9 @@ public class ArmorPiercePlugin implements EveryFrameCombatPlugin
                     // Stop the projectile (ensures a hit for fast projectiles)
                     proj.getVelocity().set(entity.getVelocity());
                     // Then move the projectile inside the ship's shield bounds
-                    Vector2f.add((Vector2f) MathUtils.getDirectionalVector(proj,
-                            entity).scale(5f), proj.getLocation(),
-                            proj.getLocation());
+                    Vector2f.add((Vector2f) VectorUtils.getDirectionalVector(
+                            proj.getLocation(), entity.getLocation()).scale(5f),
+                            proj.getLocation(), proj.getLocation());
                 }
                 // Check if the projectile is inside the entity's bounds
                 else if (CollisionUtils.isPointWithinBounds(
@@ -125,14 +126,12 @@ public class ArmorPiercePlugin implements EveryFrameCombatPlugin
 
                     // Apply damage and slow the projectile
                     // Note: BALLISTIC_AS_BEAM projectiles won't be slowed!
-                    CombatUtils.getCombatEngine().applyDamage(entity,
-                            proj.getLocation(), damage, proj.getDamageType(),
-                            emp, true, true, proj.getSource());
+                    engine.applyDamage(entity, proj.getLocation(), damage,
+                            proj.getDamageType(), emp, true, true, proj.getSource());
                     proj.getVelocity().scale(1.0f - (amount * 1.5f));
 
                     // Render the hit
-                    CombatUtils.getCombatEngine().spawnExplosion(
-                            proj.getLocation(), entity.getVelocity(),
+                    engine.spawnExplosion(proj.getLocation(), entity.getVelocity(),
                             Color.ORANGE, speed * amount * .65f, .5f);
 
                     // Play piercing sound (only one sound active per projectile)
@@ -146,5 +145,6 @@ public class ArmorPiercePlugin implements EveryFrameCombatPlugin
     @Override
     public void init(CombatEngineAPI engine)
     {
+        this.engine = engine;
     }
 }

@@ -95,6 +95,18 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
         burning.add(new FireData(target, hitLoc, totalDamage, burnDuration, source));
     }
 
+    public static void stopFire(CombatEntityAPI target)
+    {
+        for (Iterator iter = burning.iterator(); iter.hasNext();)
+        {
+            FireData tmp = (FireData) iter.next();
+            if (target == tmp.getAnchor())
+            {
+                iter.remove();
+            }
+        }
+    }
+
     @Override
     public void init(CombatEngineAPI engine)
     {
