@@ -39,6 +39,12 @@ public class ArmorPiercePlugin implements EveryFrameCombatPlugin
     @Override
     public void advance(float amount, List events)
     {
+        // Temp fix for .6.2a bug
+        if (engine != Global.getCombatEngine())
+        {
+            return;
+        }
+
         if (engine.isPaused())
         {
             return;
