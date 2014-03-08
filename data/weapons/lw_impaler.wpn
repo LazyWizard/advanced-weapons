@@ -24,5 +24,5 @@
 					   "particleColor":[100,100,255,255]},	
 	"autocharge":true,  # whether the weapon will continue charging and fire if the LMB is tapped instead of held
 	"projectileSpecId":"lw_impaler_shot",  # projectile that will be fired
-	"fireSoundTwo":"energy_pulse",
+	"fireSoundTwo":"hypervel_driver_fire",
 }
