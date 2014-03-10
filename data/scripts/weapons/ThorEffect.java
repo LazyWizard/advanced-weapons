@@ -6,7 +6,7 @@ import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.CombatEntityAPI;
 import com.fs.starfarer.api.combat.DamageType;
 import java.awt.Color;
-import org.lazywizard.lazylib.combat.WeaponUtils;
+import org.lazywizard.lazylib.MathUtils;
 import org.lazywizard.lazylib.combat.entities.SimpleEntity;
 
 public class ThorEffect implements BeamEffectPlugin
@@ -26,6 +26,12 @@ public class ThorEffect implements BeamEffectPlugin
         // Only have one EMP arc active at a time
         if (activeArc == null || !engine.isEntityInPlay(activeArc))
         {
+            // Prevents a graphics bug
+            if (MathUtils.isWithinRange(beam.getSource(), beam.getTo(), 5f))
+            {
+                return;
+            }
+
             // Beam hit something - send lightning at it!
             if (beam.getDamageTarget() != null)
             {
