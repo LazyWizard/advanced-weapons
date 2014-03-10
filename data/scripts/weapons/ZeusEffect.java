@@ -153,6 +153,12 @@ public class ZeusEffect implements BeamEffectPlugin
         // Only have one EMP arc active at a time
         if (activeArc == null || !engine.isEntityInPlay(activeArc))
         {
+            // Prevents a graphics bug
+            if (MathUtils.isWithinRange(beam.getSource(), beam.getTo(), 5f))
+            {
+                return;
+            }
+
             // Check that we hit something and that it wasn't a shield hit
             if (target != null && target instanceof ShipAPI && (target.getShield() == null
                     || !target.getShield().isWithinArc(beam.getTo())))
