@@ -42,15 +42,15 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
     {
         if (getInstance() != null)
         {
-            getInstance().stopFires(target);
+            getInstance().stopFiresActual(target);
         }
     }
 
-    private static void stopFiresInArea(CombatEntityAPI target, Vector2f loc, float radius)
+    public static void stopFiresInArea(CombatEntityAPI target, Vector2f loc, float radius)
     {
         if (getInstance() != null)
         {
-            getInstance().stopFiresInArea(target, loc, radius);
+            getInstance().stopFiresInAreaActual(target, loc, radius);
         }
     }
 
@@ -80,11 +80,15 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
             burning.put(target, fires);
         }
 
-        // TODO: merge with nearby fires on the same target
         fires.add(new FireData(target, hitLoc, totalDamage, burnDuration, source));
     }
 
     private void stopFiresActual(CombatEntityAPI target)
+    {
+        burning.remove(target);
+    }
+
+    private void stopFiresInAreaActual(CombatEntityAPI target, Vector2f loc, float radius)
     {
         if (burning.containsKey(target))
         {
@@ -92,15 +96,18 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
             for (Iterator iter = fires.iterator(); iter.hasNext();)
             {
                 FireData tmp = (FireData) iter.next();
-                iter.remove();
+                if (MathUtils.getDistance(loc, tmp.getLocation()) <= radius)
+                {
+                    iter.remove();
+                }
+            }
+
+            // All fires have been put out
+            if (fires.isEmpty())
+            {
+                burning.remove(target);
             }
         }
-    }
-
-    // TODO
-    private void stopFiresInAreaActual(CombatEntityAPI target, Vector2f loc, float radius)
-    {
-
     }
 
     @Override
@@ -182,9 +189,9 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
 
     @Override
     public void init(CombatEngineAPI engine)
-    {;
+    {
         this.engine = engine;
-        currentInstance = new WeakReference(this);
+        IncendiaryAmmoPlugin.currentInstance = new WeakReference(this);
     }
 
     private static class FireData
