@@ -185,11 +185,13 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
                     // Draw smoke effect to show where the fire is burning
                     if (showParticle)
                     {
+                        // Vary color randomly
+                        Color color = Color.DARK_GRAY;
                         engine.addSmokeParticle(fire.getLocation(), // Location
                                 MathUtils.getRandomPointOnCircumference(null, 5f), // Velocity
                                 MathUtils.getRandomNumberInRange(20f, 40f), // Size
                                 MathUtils.getRandomNumberInRange(.05f, .15f), // Brightness
-                                3f, Color.DARK_GRAY); // Duration, color
+                                3f, (Math.random() > .5 ? color : color.darker())); // Duration, color
                     }
                 }
             }

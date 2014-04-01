@@ -14,8 +14,9 @@ public class IncendiaryAmmoEffect implements OnHitEffectPlugin
     {
         if (!shieldHit)
         {
-            IncendiaryAmmoPlugin.startFire(target, point, 500f, 10f,
-                    projectile.getSource());
+            IncendiaryAmmoPlugin.startFire(target, point, // Victim, location
+                    projectile.getDamageAmount(), 10f, // Burn damage, duration
+                    projectile.getSource()); // Fire starter
         }
     }
 }
