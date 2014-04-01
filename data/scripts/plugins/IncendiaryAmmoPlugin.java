@@ -8,10 +8,10 @@ import com.fs.starfarer.api.combat.EveryFrameCombatPlugin;
 import java.awt.Color;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.WeakHashMap;
 import org.lazywizard.lazylib.MathUtils;
 import org.lazywizard.lazylib.combat.entities.AnchoredEntity;
 import org.lwjgl.util.vector.Vector2f;
@@ -22,9 +22,8 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
     private static final float TIME_BETWEEN_DAMAGE_TICKS = .2f;
     private static final float TIME_BETWEEN_PARTICLE_TICKS = .4f;
     private static WeakReference currentInstance;
-    // Stores the currently burning fires
-    // Using a WeakHashMap helps prevent memory leaks
-    private final Map burning = new WeakHashMap();
+    // <ShipAPI, List<FireData>>
+    private final Map activeFires = new HashMap();
     private boolean shouldMergeFires = false;
     private CombatEngineAPI engine;
     private float lastDamage, lastParticle;
@@ -69,15 +68,15 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
     {
         List fires;
 
-        if (burning.containsKey(target))
+        if (activeFires.containsKey(target))
         {
-            fires = (List) burning.get(target);
+            fires = (List) activeFires.get(target);
             shouldMergeFires = true;
         }
         else
         {
             fires = new ArrayList();
-            burning.put(target, fires);
+            activeFires.put(target, fires);
         }
 
         fires.add(new FireData(target, hitLoc, totalDamage, burnDuration, source));
@@ -85,14 +84,14 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
 
     private void stopFiresActual(CombatEntityAPI target)
     {
-        burning.remove(target);
+        activeFires.remove(target);
     }
 
     private void stopFiresInAreaActual(CombatEntityAPI target, Vector2f loc, float radius)
     {
-        if (burning.containsKey(target))
+        if (activeFires.containsKey(target))
         {
-            List fires = (List) burning.get(target);
+            List fires = (List) activeFires.get(target);
             for (Iterator iter = fires.iterator(); iter.hasNext();)
             {
                 FireData tmp = (FireData) iter.next();
@@ -105,7 +104,7 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
             // All fires have been put out
             if (fires.isEmpty())
             {
-                burning.remove(target);
+                activeFires.remove(target);
             }
         }
     }
@@ -113,7 +112,7 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
     @Override
     public void advance(float amount, List events)
     {
-        if (engine.isPaused() || burning.isEmpty())
+        if (engine.isPaused() || activeFires.isEmpty())
         {
             return;
         }
@@ -138,7 +137,7 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
         }
 
         // Deal fire damage for all actively burning projectiles
-        for (Iterator iter = burning.values().iterator(); iter.hasNext();)
+        for (Iterator iter = activeFires.values().iterator(); iter.hasNext();)
         {
             List fires = (List) iter.next();
             if (fires.isEmpty())
