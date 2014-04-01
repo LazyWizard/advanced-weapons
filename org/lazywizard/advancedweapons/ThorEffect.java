@@ -1,4 +1,4 @@
-package data.scripts.weapons;
+package org.lazywizard.advancedweapons;
 
 import com.fs.starfarer.api.combat.BeamAPI;
 import com.fs.starfarer.api.combat.BeamEffectPlugin;

@@ -1,10 +1,11 @@
-package data.scripts.plugins;
+package org.lazywizard.advancedweapons;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.CombatEntityAPI;
 import com.fs.starfarer.api.combat.DamageType;
 import com.fs.starfarer.api.combat.EveryFrameCombatPlugin;
+import com.fs.starfarer.api.input.InputEventAPI;
 import java.awt.Color;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -21,13 +22,12 @@ import org.lwjgl.util.vector.Vector2f;
 public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
 {
     private static final float TIME_BETWEEN_DAMAGE_TICKS = .2f;
-    private static final float TIME_BETWEEN_PARTICLE_TICKS = .4f;
-    private static WeakReference currentInstance;
-    // <ShipAPI, List<FireData>>
-    private final Map activeFires = new HashMap();
+    private static final float TIME_BETWEEN_PARTICLE_TICKS = .25f;
+    private static WeakReference<IncendiaryAmmoPlugin> currentInstance;
+    private final Map<CombatEntityAPI, List<FireData>> activeFires = new HashMap<>();
+    private float lastDamage, lastParticle;
     private boolean shouldMergeFires = false;
     private CombatEngineAPI engine;
-    private float lastDamage, lastParticle;
 
     public static void startFire(CombatEntityAPI target, Vector2f hitLoc,
             float totalDamage, float burnDuration, CombatEntityAPI source)
@@ -54,14 +54,14 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
         }
     }
 
-    public static List getFires(CombatEntityAPI target)
+    public static List<FireData> getFires(CombatEntityAPI target)
     {
         if (getInstance() != null)
         {
             return new ArrayList(getInstance().activeFires.values());
         }
 
-        return Collections.emptyList();
+        return Collections.<FireData>emptyList();
     }
 
     private static IncendiaryAmmoPlugin getInstance()
@@ -71,22 +71,22 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
             return null;
         }
 
-        return (IncendiaryAmmoPlugin) currentInstance.get();
+        return currentInstance.get();
     }
 
     private void startFireActual(CombatEntityAPI target, Vector2f hitLoc,
             float totalDamage, float burnDuration, CombatEntityAPI source)
     {
-        List fires;
+        List<FireData> fires;
 
         if (activeFires.containsKey(target))
         {
-            fires = (List) activeFires.get(target);
+            fires = activeFires.get(target);
             shouldMergeFires = true;
         }
         else
         {
-            fires = new ArrayList();
+            fires = new ArrayList<>();
             activeFires.put(target, fires);
         }
 
@@ -102,10 +102,10 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
     {
         if (activeFires.containsKey(target))
         {
-            List fires = (List) activeFires.get(target);
-            for (Iterator iter = fires.iterator(); iter.hasNext();)
+            List<FireData> fires = activeFires.get(target);
+            for (Iterator<FireData> iter = fires.iterator(); iter.hasNext();)
             {
-                FireData tmp = (FireData) iter.next();
+                FireData tmp = iter.next();
                 if (MathUtils.getDistance(loc, tmp.getLocation()) <= radius)
                 {
                     iter.remove();
@@ -121,7 +121,7 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
     }
 
     @Override
-    public void advance(float amount, List events)
+    public void advance(float amount, List<InputEventAPI> events)
     {
         if (engine.isPaused() || activeFires.isEmpty())
         {
@@ -148,9 +148,10 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
         }
 
         // Deal fire damage for all actively burning projectiles
-        for (Iterator iter = activeFires.values().iterator(); iter.hasNext();)
+        for (Iterator<List<FireData>> iter = activeFires.values().iterator(); iter.hasNext();)
         {
-            List fires = (List) iter.next();
+            List<FireData> fires = iter.next();
+
             if (fires.isEmpty())
             {
                 iter.remove();
@@ -160,12 +161,12 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
             if (shouldMergeFires && fires.size() > 1)
             {
                 // TODO
-                System.out.println("Would merge fires now.");
+                //System.out.println("Would merge fires now.");
             }
 
-            for (Iterator iter2 = fires.iterator(); iter2.hasNext();)
+            for (Iterator<FireData> iter2 = fires.iterator(); iter2.hasNext();)
             {
-                FireData fire = (FireData) iter2.next();
+                FireData fire = iter2.next();
 
                 if (engine.getTotalElapsedTime(false) >= fire.expiration
                         || !engine.isEntityInPlay(fire.getVictim()))
@@ -207,14 +208,14 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
     public static class FireData
     {
         private final AnchoredEntity hitLoc;
-        private final WeakReference source;
+        private final WeakReference<CombatEntityAPI> source;
         private final float dps, expiration;
 
         private FireData(CombatEntityAPI target, Vector2f hitLoc,
                 float totalDamage, float burnDuration, CombatEntityAPI source)
         {
             this.hitLoc = new AnchoredEntity(target, hitLoc);
-            this.source = new WeakReference(source);
+            this.source = new WeakReference<>(source);
             dps = totalDamage / burnDuration;
             expiration = Global.getCombatEngine().getTotalElapsedTime(false)
                     + burnDuration;
@@ -233,7 +234,7 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
         public CombatEntityAPI getFireSource()
         {
             // Will return null if the source has been garbage collected!
-            return (CombatEntityAPI) source.get();
+            return source.get();
         }
     }
 }
