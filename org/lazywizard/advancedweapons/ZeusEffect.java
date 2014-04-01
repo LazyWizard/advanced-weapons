@@ -1,4 +1,4 @@
-package data.scripts.weapons;
+package org.lazywizard.advancedweapons;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.BeamAPI;
@@ -8,7 +8,10 @@ import com.fs.starfarer.api.combat.CombatEntityAPI;
 import com.fs.starfarer.api.combat.DamageType;
 import com.fs.starfarer.api.combat.ShipAPI;
 import java.awt.Color;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import org.lazywizard.lazylib.MathUtils;
 import org.lazywizard.lazylib.combat.AIUtils;
 import org.lazywizard.lazylib.combat.entities.SimpleEntity;
@@ -56,7 +59,7 @@ public class ZeusEffect implements BeamEffectPlugin
 
         // This is used to prevent hitting the same target twice
         // if IGNORE_SAME_SHIP_IN_BURST is set to true
-        Set struck = new HashSet();
+        Set<CombatEntityAPI> struck = new HashSet();
 
         do
         {
@@ -82,7 +85,7 @@ public class ZeusEffect implements BeamEffectPlugin
 
             // Find our next victim
             source = currentVictim.getLocation();
-            List enemies = AIUtils.getNearbyAllies(currentVictim, range);
+            List<ShipAPI> enemies = AIUtils.getNearbyAllies(currentVictim, range);
             enemies.remove(currentVictim);
 
             // Remove enemies that have already been struck once
@@ -94,10 +97,9 @@ public class ZeusEffect implements BeamEffectPlugin
             }
 
             // Remove enemies who would block or avoid a strike
-            ShipAPI tmp;
-            for (Iterator iter = enemies.iterator(); iter.hasNext();)
+            for (Iterator<ShipAPI> iter = enemies.iterator(); iter.hasNext();)
             {
-                tmp = (ShipAPI) iter.next();
+                ShipAPI tmp = iter.next();
                 if ((tmp.getShield() != null && tmp.getShield().isOn()
                         && tmp.getShield().isWithinArc(source))
                         || (tmp.getPhaseCloak() != null
@@ -112,18 +114,17 @@ public class ZeusEffect implements BeamEffectPlugin
             {
                 if (PICK_RANDOM_ENEMY_IN_RANGE)
                 {
-                    currentVictim = (ShipAPI) enemies.get((int) (Math.random() * enemies.size()));
+                    currentVictim = enemies.get((int) (Math.random() * enemies.size()));
                 }
                 else
                 {
                     ShipAPI closest = null;
-                    float distance, closestDistance = Float.MAX_VALUE;
+                    float closestDistance = Float.MAX_VALUE;
 
                     // Find the closest enemy in range
-                    for (int x = 0; x < enemies.size(); x++)
+                    for (ShipAPI tmp : enemies)
                     {
-                        tmp = (ShipAPI) enemies.get(x);
-                        distance = MathUtils.getDistance(tmp, currentVictim);
+                        float distance = MathUtils.getDistance(tmp, currentVictim);
 
                         // This ship is closer than the previous best
                         if (distance < closestDistance)

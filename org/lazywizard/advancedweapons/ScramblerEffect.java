@@ -1,4 +1,4 @@
-package data.scripts.weapons;
+package org.lazywizard.advancedweapons;
 
 import com.fs.starfarer.api.combat.BeamAPI;
 import com.fs.starfarer.api.combat.BeamEffectPlugin;
@@ -6,22 +6,23 @@ import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.CombatEntityAPI;
 import com.fs.starfarer.api.combat.MissileAPI;
 import java.awt.Color;
-import java.util.*;
-import org.lazywizard.lazylib.combat.WeaponUtils;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 // This is designed for burst beams
 public class ScramblerEffect implements BeamEffectPlugin
 {
     private static final float SCRAMBLE_CHANCE = .25f;
-    private Set scrambled = new HashSet();
+    private final Set<MissileAPI> scrambled = new HashSet<>();
 
     @Override
     public void advance(float amount, CombatEngineAPI engine, BeamAPI beam)
     {
         // Remove expired projectiles
-        for (Iterator iter = scrambled.iterator(); iter.hasNext();)
+        for (Iterator<MissileAPI> iter = scrambled.iterator(); iter.hasNext();)
         {
-            if (!engine.isEntityInPlay((MissileAPI) iter.next()))
+            if (!engine.isEntityInPlay(iter.next()))
             {
                 iter.remove();
             }

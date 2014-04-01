@@ -1,10 +1,9 @@
-package data.scripts.weapons;
+package org.lazywizard.advancedweapons;
 
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.CombatEntityAPI;
 import com.fs.starfarer.api.combat.DamagingProjectileAPI;
 import com.fs.starfarer.api.combat.OnHitEffectPlugin;
-import data.scripts.plugins.IncendiaryAmmoPlugin;
 import org.lwjgl.util.vector.Vector2f;
 
 public class IncendiaryAmmoEffect implements OnHitEffectPlugin

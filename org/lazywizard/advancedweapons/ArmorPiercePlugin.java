@@ -1,4 +1,4 @@
-package data.scripts.plugins;
+package org.lazywizard.advancedweapons;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.CollisionClass;
@@ -6,6 +6,7 @@ import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.CombatEntityAPI;
 import com.fs.starfarer.api.combat.DamagingProjectileAPI;
 import com.fs.starfarer.api.combat.EveryFrameCombatPlugin;
+import com.fs.starfarer.api.combat.MissileAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.ShipSystemAPI;
 import java.awt.Color;
@@ -23,9 +24,9 @@ public class ArmorPiercePlugin implements EveryFrameCombatPlugin
     // Sound to play while piercing a target's armor (should be loopable!)
     private static final String PIERCE_SOUND = "explosion_flak"; // TEMPORARY
     // Projectile ID (String), pierces shields (boolean)
-    private static final Map PROJ_IDS = new HashMap();
+    private static final Map<String, Boolean> PROJ_IDS = new HashMap<>();
     // Keep track of the original collision class (used for shield hits)
-    private static final Map originalCollisionClasses = new HashMap();
+    private static final Map<String, CollisionClass> originalCollisionClasses = new HashMap<>();
     private CombatEngineAPI engine;
 
     static
@@ -49,19 +50,12 @@ public class ArmorPiercePlugin implements EveryFrameCombatPlugin
             return;
         }
 
-        DamagingProjectileAPI proj;
-        CombatEntityAPI entity;
-        String spec;
-
-        // Scan all shots on the map for armor piercing projectiles
-        for (Iterator iter = engine
-                .getProjectiles().iterator(); iter.hasNext();)
+        for (DamagingProjectileAPI proj : engine.getProjectiles())
         {
-            proj = (DamagingProjectileAPI) iter.next();
-            spec = proj.getProjectileSpecId();
+            String spec = proj.getProjectileSpecId();
 
             // Is this projectile armor piercing?
-            if (!PROJ_IDS.containsKey(spec))
+            if (proj instanceof MissileAPI || !PROJ_IDS.containsKey(spec))
             {
                 continue;
             }
@@ -84,15 +78,15 @@ public class ArmorPiercePlugin implements EveryFrameCombatPlugin
                     proj.getCollisionRadius() + 5f));
             // Don't include the ship that fired this projectile!
             toCheck.remove(proj.getSource());
+
             for (Iterator iter2 = toCheck.iterator(); iter2.hasNext();)
             {
-                entity = (CombatEntityAPI) iter2.next();
+                CombatEntityAPI entity = (CombatEntityAPI) iter2.next();
 
                 // Check for an active phase cloak
                 if (entity instanceof ShipAPI)
                 {
                     ShipSystemAPI cloak = ((ShipAPI) entity).getPhaseCloak();
-
                     if (cloak != null && cloak.isActive())
                     {
                         continue;
@@ -100,14 +94,13 @@ public class ArmorPiercePlugin implements EveryFrameCombatPlugin
                 }
 
                 // Check for a shield hit
-                if ((Boolean) PROJ_IDS.get(spec) != true
+                if ((PROJ_IDS.get(spec) != true)
                         && (entity.getShield() != null
                         && entity.getShield().isOn()
                         && entity.getShield().isWithinArc(proj.getLocation())))
                 {
                     // If we hit a shield, enable collision
-                    proj.setCollisionClass(
-                            (CollisionClass) originalCollisionClasses.get(spec));
+                    proj.setCollisionClass(originalCollisionClasses.get(spec));
                     // Stop the projectile (ensures a hit for fast projectiles)
                     proj.getVelocity().set(entity.getVelocity());
                     // Then move the projectile inside the ship's shield bounds
@@ -116,8 +109,7 @@ public class ArmorPiercePlugin implements EveryFrameCombatPlugin
                             proj.getLocation(), proj.getLocation());
                 }
                 // Check if the projectile is inside the entity's bounds
-                else if (CollisionUtils.isPointWithinBounds(
-                        proj.getLocation(), entity))
+                else if (CollisionUtils.isPointWithinBounds(proj.getLocation(), entity))
                 {
                     // Calculate projectile speed
                     float speed = proj.getVelocity().length();
