@@ -8,6 +8,7 @@ import com.fs.starfarer.api.combat.EveryFrameCombatPlugin;
 import java.awt.Color;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -51,6 +52,16 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
         {
             getInstance().stopFiresInAreaActual(target, loc, radius);
         }
+    }
+
+    public static List getFires(CombatEntityAPI target)
+    {
+        if (getInstance() != null)
+        {
+            return new ArrayList(getInstance().activeFires.values());
+        }
+
+        return Collections.emptyList();
     }
 
     private static IncendiaryAmmoPlugin getInstance()
@@ -157,7 +168,7 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
                 FireData fire = (FireData) iter2.next();
 
                 if (engine.getTotalElapsedTime(false) >= fire.expiration
-                        || !engine.isEntityInPlay(fire.getAnchor()))
+                        || !engine.isEntityInPlay(fire.getVictim()))
                 {
                     iter2.remove();
                 }
@@ -165,9 +176,9 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
                 {
                     if (dealDamage)
                     {
-                        engine.applyDamage(fire.getAnchor(), fire.getLocation(),
+                        engine.applyDamage(fire.getVictim(), fire.getLocation(),
                                 fire.dps * damageMod, DamageType.FRAGMENTATION,
-                                fire.dps * damageMod, true, true, fire.source.get());
+                                fire.dps * damageMod, true, true, fire.getFireSource());
                     }
 
                     // Draw smoke effect to show where the fire is burning
@@ -193,7 +204,7 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
         IncendiaryAmmoPlugin.currentInstance = new WeakReference(this);
     }
 
-    private static class FireData
+    public static class FireData
     {
         private final AnchoredEntity hitLoc;
         private final WeakReference source;
@@ -214,9 +225,15 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
             return hitLoc.getLocation();
         }
 
-        public CombatEntityAPI getAnchor()
+        public CombatEntityAPI getVictim()
         {
             return hitLoc.getAnchor();
+        }
+
+        public CombatEntityAPI getFireSource()
+        {
+            // Will return null if the source has been garbage collected!
+            return (CombatEntityAPI) source.get();
         }
     }
 }
