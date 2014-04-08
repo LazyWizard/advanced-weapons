@@ -45,7 +45,7 @@ public class ScramblerEffect implements BeamEffectPlugin
                 return;
             }
 
-            // Only one chance to scramble a missile!
+            // Only one chance to scramble a missile per beam
             if (scrambled.contains(missile))
             {
                 return;
