@@ -131,21 +131,8 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
         lastDamage += amount;
         lastParticle += amount;
 
-        float damageMod = lastDamage;
-
-        boolean dealDamage = false;
-        if (lastDamage >= TIME_BETWEEN_DAMAGE_TICKS)
-        {
-            lastDamage -= TIME_BETWEEN_DAMAGE_TICKS;
-            dealDamage = true;
-        }
-
-        boolean showParticle = false;
-        if (lastParticle >= TIME_BETWEEN_PARTICLE_TICKS)
-        {
-            lastParticle -= TIME_BETWEEN_PARTICLE_TICKS;
-            showParticle = true;
-        }
+        boolean dealDamage = (lastDamage >= TIME_BETWEEN_DAMAGE_TICKS);
+        boolean showParticle = (lastParticle >= TIME_BETWEEN_PARTICLE_TICKS);
 
         // Deal fire damage for all actively burning projectiles
         for (Iterator<List<FireData>> iter = activeFires.values().iterator(); iter.hasNext();)
@@ -178,8 +165,8 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
                     if (dealDamage)
                     {
                         engine.applyDamage(fire.getVictim(), fire.getLocation(),
-                                fire.dps * damageMod, DamageType.FRAGMENTATION,
-                                fire.dps * damageMod, true, true, fire.getFireSource());
+                                fire.dps * lastDamage, DamageType.FRAGMENTATION,
+                                fire.dps * lastDamage, true, true, fire.getFireSource());
                     }
 
                     // Draw smoke effect to show where the fire is burning
@@ -191,10 +178,21 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
                                 MathUtils.getRandomPointOnCircumference(null, 5f), // Velocity
                                 MathUtils.getRandomNumberInRange(20f, 40f), // Size
                                 MathUtils.getRandomNumberInRange(.05f, .15f), // Brightness
-                                3f, (Math.random() > .5 ? color : color.darker())); // Duration, color
+                                MathUtils.getRandomNumberInRange(2.5f, 3.5f), // Duration
+                                (Math.random() > .5 ? color : color.darker())); // Color
                     }
                 }
             }
+        }
+
+        if (dealDamage)
+        {
+            lastDamage -= TIME_BETWEEN_DAMAGE_TICKS;
+        }
+
+        if (showParticle)
+        {
+            lastParticle -= TIME_BETWEEN_PARTICLE_TICKS;
         }
 
         shouldMergeFires = false;
@@ -204,20 +202,20 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
     public void init(CombatEngineAPI engine)
     {
         this.engine = engine;
-        IncendiaryAmmoPlugin.currentInstance = new WeakReference(this);
+        IncendiaryAmmoPlugin.currentInstance = new WeakReference<>(this);
     }
 
     public static class FireData
     {
         private final AnchoredEntity hitLoc;
-        private final WeakReference<CombatEntityAPI> source;
+        private final CombatEntityAPI source;
         private final float dps, expiration;
 
         private FireData(CombatEntityAPI target, Vector2f hitLoc,
                 float totalDamage, float burnDuration, CombatEntityAPI source)
         {
             this.hitLoc = new AnchoredEntity(target, hitLoc);
-            this.source = new WeakReference<>(source);
+            this.source = source;
             dps = totalDamage / burnDuration;
             expiration = Global.getCombatEngine().getTotalElapsedTime(false)
                     + burnDuration;
@@ -235,8 +233,7 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
 
         public CombatEntityAPI getFireSource()
         {
-            // Will return null if the source has been garbage collected!
-            return source.get();
+            return source;
         }
     }
 }
