@@ -32,7 +32,7 @@ public class ZeusEffect implements BeamEffectPlugin
     // What color is the core of the arc?
     private static final Color CORE_COLOR = new Color(255, 255, 255, 255);
     // What color is the fringe of the arc?
-    private static final Color FRINGE_COLOR = Color.GREEN; //new Color(85, 25, 215, 255);
+    private static final Color FRINGE_COLOR = new Color(85, 25, 215, 255);
     // How long since the last arc (used for DPS calculations)
     private float timeSinceLastArc = 0f;
     // The current damaging and decorative (non-targeted) arcs
@@ -67,7 +67,8 @@ public class ZeusEffect implements BeamEffectPlugin
             activeArc = Global.getCombatEngine().spawnEmpArc(
                     beam.getSource(), source,
                     currentEmitter, currentVictim,
-                    DamageType.ENERGY, damage, emp, range,
+                    beam.getWeapon().getDamageType(),
+                    damage, emp, range,
                     "tachyon_lance_emp_impact", 15f,
                     FRINGE_COLOR, CORE_COLOR);
             currentEmitter = currentVictim;
@@ -178,7 +179,7 @@ public class ZeusEffect implements BeamEffectPlugin
                 timeSinceLastArc = 0f;
                 decorativeArc = engine.spawnEmpArc(beam.getSource(), beam.getFrom(),
                         beam.getSource(), new SimpleEntity(beam.getTo()),
-                        DamageType.ENERGY, 0f, 0f,
+                        beam.getWeapon().getDamageType(), 0f, 0f,
                         beam.getWeapon().getRange(),
                         "tachyon_lance_emp_impact", 15f,
                         FRINGE_COLOR, CORE_COLOR);

@@ -14,7 +14,7 @@ public class ThorEffect implements BeamEffectPlugin
     // What color is the core of the arc?
     private static final Color CORE_COLOR = new Color(255, 255, 255, 255);
     // What color is the fringe of the arc?
-    private static final Color FRINGE_COLOR = Color.YELLOW; //new Color(85, 25, 215, 255);
+    private static final Color FRINGE_COLOR = new Color(85, 25, 215, 255);
     // How long since the last arc (used for DPS calculations)
     private float timeSinceLastArc = 0f;
     // The current damaging and decorative (non-targeted) arcs
@@ -35,6 +35,7 @@ public class ThorEffect implements BeamEffectPlugin
             // Beam hit something - send lightning at it!
             if (beam.getDamageTarget() != null)
             {
+                // Only one arc should be active at a time
                 if (decorativeArc != null && engine.isEntityInPlay(decorativeArc))
                 {
                     engine.removeEntity(decorativeArc);
@@ -45,7 +46,7 @@ public class ThorEffect implements BeamEffectPlugin
                 timeSinceLastArc = 0f;
                 activeArc = engine.spawnEmpArc(beam.getSource(), beam.getFrom(),
                         beam.getSource(), beam.getDamageTarget(),
-                        DamageType.ENERGY, damage, emp,
+                        beam.getWeapon().getDamageType(), damage, emp,
                         beam.getWeapon().getRange(),
                         "tachyon_lance_emp_impact", 15f,
                         FRINGE_COLOR, CORE_COLOR);
