@@ -8,10 +8,15 @@ import com.fs.starfarer.api.util.IntervalUtil;
 
 public class IncendiaryBeamEffect implements BeamEffectPlugin
 {
+    // How frequently to start a fire (higher = less lag, less responsiveness)
     private static final float CAUSE_FIRE_EVERY_X_SECONDS = 1f;
-    private static final float FIRE_DAMAGE_TOTAL = 500f;
-    private static final float FIRE_DAMAGE_DURATION = 500f;
-    private CombatEntityAPI currentTarget = null, lastTarget = null;
+    // For every second you hold the beam on a target,
+    // this amount of fire damage will be dealt over time
+    private static final float DAMAGE_PER_SECOND_HELD = 150f;
+    // How long the fire will be active, in seconds
+    // The damage amount will be spread out over this time (lower = more DPS)
+    private static final float FIRE_DURATION = 5f;
+    private CombatEntityAPI lastTarget = null;
     private final IntervalUtil fireTimer = new IntervalUtil(
             CAUSE_FIRE_EVERY_X_SECONDS, CAUSE_FIRE_EVERY_X_SECONDS);
 
@@ -21,32 +26,26 @@ public class IncendiaryBeamEffect implements BeamEffectPlugin
         CombatEntityAPI target = beam.getDamageTarget();
         if (target != null)
         {
-            // New target? Start a fire immediately
-            if (target != currentTarget && target != lastTarget)
+            // New target = new fire countdown
+            if (target != lastTarget)
             {
-                IncendiaryAmmoPlugin.startFire(target, beam.getTo(),
-                        FIRE_DAMAGE_TOTAL, FIRE_DAMAGE_DURATION, beam.getSource());
+                //System.out.println("Starting countdown for " + target);
                 fireTimer.setInterval(CAUSE_FIRE_EVERY_X_SECONDS,
                         CAUSE_FIRE_EVERY_X_SECONDS);
             }
-            // Old target? Only start a new fire occasionally (optimization)
-            else
-            {
-                fireTimer.advance(amount);
-                if (fireTimer.intervalElapsed())
-                {
-                    IncendiaryAmmoPlugin.startFire(target, beam.getTo(),
-                            FIRE_DAMAGE_TOTAL, FIRE_DAMAGE_DURATION, beam.getSource());
-                }
-            }
 
             // Keep track of who we are currently hitting
-            currentTarget = lastTarget = target;
-        }
-        else
-        {
-            // Not hitting anyone? Reset the target
-            currentTarget = null;
+            lastTarget = target;
+
+            // Only cause fires occasionally (reduces lag)
+            fireTimer.advance(amount);
+            if (fireTimer.intervalElapsed())
+            {
+                //System.out.println("Starting fire on " + target);
+                IncendiaryAmmoPlugin.startFire(target, beam.getTo(),
+                        DAMAGE_PER_SECOND_HELD * CAUSE_FIRE_EVERY_X_SECONDS,
+                        FIRE_DURATION, beam.getSource());
+            }
         }
     }
 }
