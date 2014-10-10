@@ -1,11 +1,5 @@
 package org.lazywizard.advancedweapons;
 
-import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.combat.CombatEngineAPI;
-import com.fs.starfarer.api.combat.CombatEntityAPI;
-import com.fs.starfarer.api.combat.DamageType;
-import com.fs.starfarer.api.combat.EveryFrameCombatPlugin;
-import com.fs.starfarer.api.input.InputEventAPI;
 import java.awt.Color;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -14,6 +8,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.combat.CombatEngineAPI;
+import com.fs.starfarer.api.combat.CombatEntityAPI;
+import com.fs.starfarer.api.combat.DamageType;
+import com.fs.starfarer.api.combat.EveryFrameCombatPlugin;
+import com.fs.starfarer.api.combat.ViewportAPI;
+import com.fs.starfarer.api.input.InputEventAPI;
 import org.lazywizard.lazylib.MathUtils;
 import org.lazywizard.lazylib.combat.entities.AnchoredEntity;
 import org.lwjgl.util.vector.Vector2f;
@@ -203,6 +204,16 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
     {
         this.engine = engine;
         IncendiaryAmmoPlugin.currentInstance = new WeakReference<>(this);
+    }
+
+    @Override
+    public void renderInWorldCoords(ViewportAPI view)
+    {
+    }
+
+    @Override
+    public void renderInUICoords(ViewportAPI view)
+    {
     }
 
     public static class FireData

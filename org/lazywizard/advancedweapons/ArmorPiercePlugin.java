@@ -1,5 +1,10 @@
 package org.lazywizard.advancedweapons;
 
+import java.awt.Color;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.CollisionClass;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
@@ -9,11 +14,7 @@ import com.fs.starfarer.api.combat.EveryFrameCombatPlugin;
 import com.fs.starfarer.api.combat.MissileAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.ShipSystemAPI;
-import java.awt.Color;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import com.fs.starfarer.api.combat.ViewportAPI;
 import org.lazywizard.lazylib.CollisionUtils;
 import org.lazywizard.lazylib.VectorUtils;
 import org.lazywizard.lazylib.combat.CombatUtils;
@@ -143,5 +144,15 @@ public class ArmorPiercePlugin implements EveryFrameCombatPlugin
     public void init(CombatEngineAPI engine)
     {
         this.engine = engine;
+    }
+
+    @Override
+    public void renderInWorldCoords(ViewportAPI view)
+    {
+    }
+
+    @Override
+    public void renderInUICoords(ViewportAPI view)
+    {
     }
 }
