@@ -6,21 +6,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.combat.CollisionClass;
-import com.fs.starfarer.api.combat.CombatEngineAPI;
-import com.fs.starfarer.api.combat.CombatEntityAPI;
-import com.fs.starfarer.api.combat.DamagingProjectileAPI;
-import com.fs.starfarer.api.combat.EveryFrameCombatPlugin;
-import com.fs.starfarer.api.combat.MissileAPI;
-import com.fs.starfarer.api.combat.ShipAPI;
-import com.fs.starfarer.api.combat.ShipSystemAPI;
-import com.fs.starfarer.api.combat.ViewportAPI;
+import com.fs.starfarer.api.combat.*;
 import org.lazywizard.lazylib.CollisionUtils;
 import org.lazywizard.lazylib.VectorUtils;
 import org.lazywizard.lazylib.combat.CombatUtils;
 import org.lwjgl.util.vector.Vector2f;
 
-public class ArmorPiercePlugin implements EveryFrameCombatPlugin
+public class ArmorPiercePlugin extends BaseEveryFrameCombatPlugin
 {
     // Sound to play while piercing a target's armor (should be loopable!)
     private static final String PIERCE_SOUND = "explosion_flak"; // TEMPORARY
@@ -28,7 +20,6 @@ public class ArmorPiercePlugin implements EveryFrameCombatPlugin
     private static final Map<String, Boolean> PROJ_IDS = new HashMap<>();
     // Keep track of the original collision class (used for shield hits)
     private static final Map<String, CollisionClass> originalCollisionClasses = new HashMap<>();
-    private CombatEngineAPI engine;
 
     static
     {
@@ -40,13 +31,8 @@ public class ArmorPiercePlugin implements EveryFrameCombatPlugin
     @Override
     public void advance(float amount, List events)
     {
-        // Temp fix for .6.2a bug
-        if (engine != Global.getCombatEngine())
-        {
-            return;
-        }
-
-        if (engine.isPaused())
+        final CombatEngineAPI engine = Global.getCombatEngine();
+        if (engine == null || engine.isPaused())
         {
             return;
         }
@@ -138,21 +124,5 @@ public class ArmorPiercePlugin implements EveryFrameCombatPlugin
                 }
             }
         }
-    }
-
-    @Override
-    public void init(CombatEngineAPI engine)
-    {
-        this.engine = engine;
-    }
-
-    @Override
-    public void renderInWorldCoords(ViewportAPI view)
-    {
-    }
-
-    @Override
-    public void renderInUICoords(ViewportAPI view)
-    {
     }
 }
