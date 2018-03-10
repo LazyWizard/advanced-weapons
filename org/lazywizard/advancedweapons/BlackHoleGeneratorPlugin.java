@@ -1,28 +1,22 @@
 package org.lazywizard.advancedweapons;
 
-import java.awt.Color;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.combat.CombatEngineAPI;
-import com.fs.starfarer.api.combat.CombatEntityAPI;
-import com.fs.starfarer.api.combat.DamageType;
-import com.fs.starfarer.api.combat.DamagingProjectileAPI;
-import com.fs.starfarer.api.combat.EveryFrameCombatPlugin;
-import com.fs.starfarer.api.combat.MissileAPI;
-import com.fs.starfarer.api.combat.ShipAPI;
+import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.combat.ShipAPI.HullSize;
-import com.fs.starfarer.api.combat.ViewportAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
 import org.lazywizard.lazylib.MathUtils;
 import org.lazywizard.lazylib.VectorUtils;
 import org.lazywizard.lazylib.combat.CombatUtils;
 import org.lwjgl.util.vector.Vector2f;
 
+import java.awt.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 // TODO: Change calculations to use time elapsed instead of number of frames
-public class BlackHoleGeneratorPlugin implements EveryFrameCombatPlugin
+public class BlackHoleGeneratorPlugin extends BaseEveryFrameCombatPlugin
 {
     // Whether to show debug particles in and around the black holes
     private static final boolean RENDER_DEBUG = false;
@@ -88,8 +82,6 @@ public class BlackHoleGeneratorPlugin implements EveryFrameCombatPlugin
     private int numUpdates = 0;
     // When to next render floating text
     private float nextRender = RENDER_TEXT_INTERVAL;
-    // The current combat engine
-    private CombatEngineAPI engine;
 
     private void applyDamage(Vector2f center, CombatEntityAPI victim, float time)
     {
@@ -97,16 +89,17 @@ public class BlackHoleGeneratorPlugin implements EveryFrameCombatPlugin
         Vector2f point = MathUtils.getRandomPointInCircle(center, DAMAGE_ZONE_RADIUS);
 
         // Check if the point would hit the victim
+        final CombatEngineAPI engine = Global.getCombatEngine();
         if (MathUtils.isPointWithinCircle(point, victim.getLocation(),
                 victim.getCollisionRadius()))
         {
             // Many tiny points = increases armor reduction, uniform damage
             engine.applyDamage(victim, point, (DAMAGE_ZONE_DPS * time
-                    * FRAMES_PER_DAMAGE_POINT) * (1 - DAMAGE_ZONE_BLOCKABLE_PERCENT),
+                            * FRAMES_PER_DAMAGE_POINT) * (1 - DAMAGE_ZONE_BLOCKABLE_PERCENT),
                     DamageType.HIGH_EXPLOSIVE, 0f, true, true, null);
             // Part of the damage + all of the EMP can be blocked by shields
             engine.applyDamage(victim, point, (DAMAGE_ZONE_DPS * time
-                    * FRAMES_PER_DAMAGE_POINT) * DAMAGE_ZONE_BLOCKABLE_PERCENT,
+                            * FRAMES_PER_DAMAGE_POINT) * DAMAGE_ZONE_BLOCKABLE_PERCENT,
                     DamageType.KINETIC, DAMAGE_ZONE_EMP_DPS * time * FRAMES_PER_DAMAGE_POINT,
                     false, false, null);
 
@@ -131,6 +124,7 @@ public class BlackHoleGeneratorPlugin implements EveryFrameCombatPlugin
         Vector2f particlePos, particleVel;
 
         // Render particles for gravity well
+        final CombatEngineAPI engine = Global.getCombatEngine();
         for (int x = 0; x < GRAVITY_WELL_PARTICLE_DENSITY; x++)
         {
             particlePos = MathUtils.getRandomPointOnCircumference(center,
@@ -158,7 +152,7 @@ public class BlackHoleGeneratorPlugin implements EveryFrameCombatPlugin
             engine.spawnExplosion(center, NULLVEL,
                     (Math.random() >= .5 ? GRAVITY_WELL_PARTICLE_COLOR : DAMAGE_ZONE_PARTICLE_COLOR),
                     DAMAGE_ZONE_RADIUS / 3 + (float) (Math.random()
-                    * DAMAGE_ZONE_RADIUS / 10) - DAMAGE_ZONE_RADIUS / 20,
+                            * DAMAGE_ZONE_RADIUS / 10) - DAMAGE_ZONE_RADIUS / 20,
                     remaining / 2);
         }
 
@@ -195,7 +189,7 @@ public class BlackHoleGeneratorPlugin implements EveryFrameCombatPlugin
 
             // Add text counting down how long until the projectile explodes
             DamagingProjectileAPI proj = tmp.getKey();
-            engine.addFloatingText(proj.getLocation(), "" + (int) remaining,
+            Global.getCombatEngine().addFloatingText(proj.getLocation(), "" + (int) remaining,
                     25f, RENDER_TEXT_COLOR, proj, 0f, 0f);
         }
     }
@@ -263,7 +257,7 @@ public class BlackHoleGeneratorPlugin implements EveryFrameCombatPlugin
     private void updateHoles(float time)
     {
         // Iterate through all active black holes on the map
-        for (Iterator<Map.Entry<Vector2f, Float>> iter = holes.entrySet().iterator(); iter.hasNext();)
+        for (Iterator<Map.Entry<Vector2f, Float>> iter = holes.entrySet().iterator(); iter.hasNext(); )
         {
             Map.Entry<Vector2f, Float> tmp = iter.next();
             float remaining = tmp.getValue() - curTime;
@@ -301,7 +295,7 @@ public class BlackHoleGeneratorPlugin implements EveryFrameCombatPlugin
 
     private void scanForProjs()
     {
-        for (DamagingProjectileAPI toCheck : engine.getProjectiles())
+        for (DamagingProjectileAPI toCheck : Global.getCombatEngine().getProjectiles())
         {
             // Check if the projectile is the type that spawns black holes
             if (SHELL_ID.equals(toCheck.getProjectileSpecId()))
@@ -342,7 +336,7 @@ public class BlackHoleGeneratorPlugin implements EveryFrameCombatPlugin
         if (!projs.isEmpty())
         {
             // Check if any registered projectiles caused damage this frame
-            for (Iterator<DamagingProjectileAPI> iter = projs.keySet().iterator(); iter.hasNext();)
+            for (Iterator<DamagingProjectileAPI> iter = projs.keySet().iterator(); iter.hasNext(); )
             {
                 DamagingProjectileAPI tmp = iter.next();
                 // Projectile hit something, spawn the black hole
@@ -360,6 +354,7 @@ public class BlackHoleGeneratorPlugin implements EveryFrameCombatPlugin
     {
         Vector2f location = shell.getLocation();
         // Remove the projectile
+        final CombatEngineAPI engine = Global.getCombatEngine();
         engine.removeEntity(shell);
         engine.spawnExplosion(location, NULLVEL, GRAVITY_WELL_PARTICLE_COLOR, 50f, duration);
         // Create a black hole in its place
@@ -369,14 +364,9 @@ public class BlackHoleGeneratorPlugin implements EveryFrameCombatPlugin
     @Override
     public void advance(float amount, List<InputEventAPI> events)
     {
-        // Temp fix for .6.2a bug
-        if (engine != Global.getCombatEngine())
-        {
-            return;
-        }
-
         // Don't deal damage while paused
-        if (engine.isPaused())
+        final CombatEngineAPI engine = Global.getCombatEngine();
+        if (engine == null || engine.isPaused())
         {
             return;
         }
@@ -393,21 +383,5 @@ public class BlackHoleGeneratorPlugin implements EveryFrameCombatPlugin
         {
             updateHoles(amount);
         }
-    }
-
-    @Override
-    public void init(CombatEngineAPI engine)
-    {
-        this.engine = engine;
-    }
-
-    @Override
-    public void renderInWorldCoords(ViewportAPI view)
-    {
-    }
-
-    @Override
-    public void renderInUICoords(ViewportAPI view)
-    {
     }
 }

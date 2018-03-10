@@ -9,18 +9,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.combat.CombatEngineAPI;
-import com.fs.starfarer.api.combat.CombatEntityAPI;
-import com.fs.starfarer.api.combat.DamageType;
-import com.fs.starfarer.api.combat.EveryFrameCombatPlugin;
-import com.fs.starfarer.api.combat.ViewportAPI;
+import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.input.InputEventAPI;
 import org.lazywizard.lazylib.MathUtils;
 import org.lazywizard.lazylib.combat.entities.AnchoredEntity;
 import org.lwjgl.util.vector.Vector2f;
 
 // TODO: Check for nearby fires and merge them for better performance
-public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
+public class IncendiaryAmmoPlugin extends BaseEveryFrameCombatPlugin
 {
     private static final float TIME_BETWEEN_DAMAGE_TICKS = .2f;
     private static final float TIME_BETWEEN_PARTICLE_TICKS = .25f;
@@ -28,7 +24,6 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
     private final Map<CombatEntityAPI, List<FireData>> activeFires = new HashMap<>();
     private float lastDamage, lastParticle;
     private boolean shouldMergeFires = false;
-    private CombatEngineAPI engine;
 
     public static void startFire(CombatEntityAPI target, Vector2f hitLoc,
             float totalDamage, float burnDuration, CombatEntityAPI source)
@@ -124,7 +119,8 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
     @Override
     public void advance(float amount, List<InputEventAPI> events)
     {
-        if (engine.isPaused() || activeFires.isEmpty())
+        final CombatEngineAPI engine = Global.getCombatEngine();
+        if (engine == null || engine.isPaused() || activeFires.isEmpty())
         {
             return;
         }
@@ -202,18 +198,7 @@ public class IncendiaryAmmoPlugin implements EveryFrameCombatPlugin
     @Override
     public void init(CombatEngineAPI engine)
     {
-        this.engine = engine;
         IncendiaryAmmoPlugin.currentInstance = new WeakReference<>(this);
-    }
-
-    @Override
-    public void renderInWorldCoords(ViewportAPI view)
-    {
-    }
-
-    @Override
-    public void renderInUICoords(ViewportAPI view)
-    {
     }
 
     public static class FireData
